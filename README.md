@@ -72,7 +72,7 @@ Vrai No Helmet         6             44
 Input Image (224×224×3)
         ↓
 ┌─────────────────────────────────────┐
-│  MobileNetV2 [Pré-entraîné]        │
+│  MobileNetV2 [Pré-entraîné]         │
 │  - 250 couches                      │
 │  - 2.3M paramètres                  │
 │  - Gelé en Phase 1                  │
@@ -160,7 +160,6 @@ helmet-detection-transfer-learning/
 
 ```bash
 git clone https://github.com/AkramNejj33/Helmet-Detection-with-Transfer-Learning.git
-cd helmet-detection-transfer-learning
 ```
 
 #### 2️⃣ Créer un environnement virtuel
@@ -190,7 +189,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-⏱️ L'installation prend **5-15 minutes** (TensorFlow est volumineux)
 
 #### 4️⃣ Télécharger et organiser les données
 
@@ -235,7 +233,6 @@ python Scripts/train.py
 - `models/model_final.h5` (modèle final)
 - `results/training_curves.png` (courbes d'entraînement)
 
-**Durée** : ~3-7 minutes
 
 **Tu verras** :
 ```
@@ -336,7 +333,7 @@ python Scripts/predict_server.py
 **Terminal 2 : Tester une image**
 
 ```bash
-python Scripts/test_predict.py data/dataset/test/helmet/img1.jpg
+python Scripts/test_predict.py path/to/img.jpg
 ```
 
 **Résultat** :
@@ -536,70 +533,6 @@ Moyenne harmonique de Precision et Recall
 
 ---
 
-## 🚨 Dépannage
-
-### Problème : "OSError: [WinError 5] Accès refusé"
-
-**Solution** : Exécuter PowerShell en tant qu'administrateur
-```bash
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-venv\Scripts\Activate.ps1
-```
-
-### Problème : "No module named 'tensorflow'"
-
-**Solution** : Vérifier que l'environnement est activé
-```bash
-which python  # ou where python sur Windows
-```
-
-Le chemin doit contenir `venv`.
-
-### Problème : Installation TensorFlow très lente
-
-**Solution** : Utiliser la version CPU
-```bash
-pip install tensorflow-cpu==2.14.0
-```
-
-### Problème : "FileNotFoundError: data/dataset not found"
-
-**Solution** : Organiser les données dans la structure correcte
-```
-data/dataset/train/helmet/
-data/dataset/train/no_helmet/
-data/dataset/val/helmet/
-data/dataset/val/no_helmet/
-data/dataset/test/helmet/
-data/dataset/test/no_helmet/
-```
-
-### Problème : "ModuleNotFoundError: No module named 'Scripts'"
-
-**Solution** : Lancer les scripts depuis la racine du projet
-```bash
-# Correct ✅
-python Scripts/train.py
-
-# Incorrect ❌
-cd Scripts
-python train.py
-```
-
----
-
-## 📚 Améliorations Futures
-
-- [ ] Implémenter YOLO pour détection spatiale (bounding box)
-- [ ] Optimiser pour inférence mobile (TensorFlow Lite)
-- [ ] Ajouter une API REST complète pour déploiement en production
-- [ ] Créer une application web (Streamlit/Flask)
-- [ ] Augmenter la diversité du dataset (différentes ethnies, environnements)
-- [ ] Implémenter la détection vidéo en temps réel
-- [ ] Support pour d'autres casques (moto, construction, etc.)
-
----
-
 ## 🔗 Ressources & Références
 
 - [MobileNetV2 Paper](https://arxiv.org/abs/1801.04381)
@@ -608,12 +541,6 @@ python train.py
 - [Kaggle Dataset](https://www.kaggle.com/datasets/meliodassourav/traffic-violation-dataset-v3)
 - [Transfer Learning Guide](https://cs231n.github.io/transfer-learning/)
 - [Keras API Reference](https://keras.io/api/)
-
----
-
-## 📄 Licence
-
-Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de détails.
 
 ---
 
@@ -638,7 +565,5 @@ Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de déta
 <div align="center">
 
 **Made with ❤️ for Computer Vision & Transfer Learning**
-
-⭐ Si ce projet t'a été utile, n'hésite pas à laisser une star !
 
 </div>
