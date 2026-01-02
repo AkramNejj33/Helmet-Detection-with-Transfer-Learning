@@ -1,0 +1,24 @@
+# Données (trop volumineuses)
+data/dataset/
+*.jpg
+*.png
+*.jpeg
+
+# Modèles sauvegardés
+*.h5
+*.pkl
+
+# Cache Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Résultats temporaires
+*.log
+
+venv/
