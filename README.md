@@ -105,15 +105,26 @@ Output: [P(Helmet), P(No Helmet)]
 ```
 helmet-detection-transfer-learning/
 │
-├── 📄 README.md                      # Documentation
+├── 📄 README.md                      # Documentation (ce fichier)
 ├── 📄 requirements.txt               # Dépendances Python
 ├── 📄 .gitignore                     # Fichiers à ignorer
 │
-├── 📁 data/
+├── 📁 Scripts/                       # Scripts Python
+│   ├── 🐍 train.py                   # Entraînement (Phase 1 & 2)
+│   ├── 🐍 evaluate.py                # Évaluation et métriques
+│   ├── 🐍 predict_server.py          # Serveur Flask pour prédictions
+│   └── 🐍 test_predict.py            # Test des prédictions
+│
+├── 📁 data/                          # Données
 │   └── dataset/
 │       ├── train/                    # Images d'entraînement (60%)
 │       │   ├── helmet/
+│       │   │   ├── img1.jpg
+│       │   │   ├── img2.jpg
+│       │   │   └── ...
 │       │   └── no_helmet/
+│       │       ├── img1.jpg
+│       │       └── ...
 │       ├── val/                      # Images de validation (20%)
 │       │   ├── helmet/
 │       │   └── no_helmet/
@@ -128,10 +139,9 @@ helmet-detection-transfer-learning/
 ├── 📁 results/                       # Résultats et visualisations
 │   ├── training_curves.png          # Courbes Loss/Accuracy
 │   ├── confusion_matrix.png         # Matrice de confusion
-│   └── metrics.txt                  # Résultats chiffrés
+│   └── evaluation_results.txt       # Résultats chiffrés
 │
-├── 🐍 train.py                       # Script d'entraînement (Phase 1 & 2)
-└── 🐍 evaluate.py                    # Script d'évaluation
+└── 📁 venv/                          # Environnement virtuel
 ```
 
 ---
@@ -150,13 +160,14 @@ helmet-detection-transfer-learning/
 
 ```bash
 git clone https://github.com/AkramNejj33/Helmet-Detection-with-Transfer-Learning.git
+cd helmet-detection-transfer-learning
 ```
 
 #### 2️⃣ Créer un environnement virtuel
 
 **Sur macOS / Linux** :
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -166,6 +177,12 @@ python -m venv venv
 venv\Scripts\Activate.ps1
 ```
 
+**Sur Windows (cmd)** :
+```bash
+python -m venv venv
+venv\Scripts\activate.bat
+```
+
 #### 3️⃣ Installer les dépendances
 
 ```bash
@@ -173,6 +190,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+⏱️ L'installation prend **5-15 minutes** (TensorFlow est volumineux)
 
 #### 4️⃣ Télécharger et organiser les données
 
@@ -183,39 +201,156 @@ Organise les images dans la structure :
 data/dataset/
 ├── train/
 │   ├── helmet/
+│   │   ├── img1.jpg
+│   │   ├── img2.jpg
+│   │   └── ... (1500+ images)
 │   └── no_helmet/
+│       ├── img1.jpg
+│       ├── img2.jpg
+│       └── ... (1500+ images)
 ├── val/
 │   ├── helmet/
+│   │   └── ... (250+ images)
 │   └── no_helmet/
+│       └── ... (250+ images)
 └── test/
     ├── helmet/
+    │   └── ... (250+ images)
     └── no_helmet/
+        └── ... (250+ images)
 ```
 
 ---
 
 ## 🎯 Utilisation
 
-### Entraîner le modèle
+### 1️⃣ Entraîner le modèle
 
 ```bash
-python train.py
+python Scripts/train.py
 ```
 
-**Sortie** :
-- `model_phase1.h5` (modèle après Phase 1)
-- `model_final.h5` (modèle final)
-- `training_curves.png` (courbes d'entraînement)
+**Sortie générée** :
+- `models/model_phase1.h5` (modèle après Phase 1)
+- `models/model_final.h5` (modèle final)
+- `results/training_curves.png` (courbes d'entraînement)
 
-### Évaluer le modèle
+**Durée** : ~3-7 minutes
+
+**Tu verras** :
+```
+✓ Dossiers 'models' et 'results' créés/vérifiés
+📁 Chargement des données...
+✓ Train samples : 3000
+✓ Val samples : 500
+
+🧠 Création du modèle...
+✓ Modèle créé avec 2307842 paramètres
+
+============================================================
+PHASE 1 : FEATURE EXTRACTION (Couches gelées)
+============================================================
+Epoch 1/10
+32/32 [==============================] 50s - loss: 0.6234 - accuracy: 0.6234
+...
+Epoch 10/10
+32/32 [==============================] 45s - loss: 0.1890 - accuracy: 0.8756
+
+✓ Modèle Phase 1 sauvegardé : models/model_phase1.h5
+
+============================================================
+PHASE 2 : FINE-TUNING (Dégel partiel)
+============================================================
+Epoch 1/10
+32/32 [==============================] 65s - loss: 0.1567 - accuracy: 0.8834
+...
+Epoch 10/10
+32/32 [==============================] 63s - loss: 0.0456 - accuracy: 0.9345
+
+✓ Modèle final sauvegardé : models/model_final.h5
+
+✅ Entraînement terminé !
+```
+
+### 2️⃣ Évaluer le modèle
 
 ```bash
-python evaluate.py
+python Scripts/evaluate.py
 ```
 
-**Sortie** :
-- Métriques (Accuracy, Loss, Precision, Recall, F1-Score)
-- `confusion_matrix.png` (matrice de confusion)
+**Sortie générée** :
+- `results/confusion_matrix.png` (matrice de confusion)
+- `results/evaluation_results.txt` (résultats chiffrés)
+
+**Affichage** :
+```
+✓ Dossiers 'models' et 'results' créés/vérifiés
+
+📁 Chargement du modèle final...
+✓ Modèle chargé : models/model_final.h5
+
+============================================================
+ÉVALUATION SUR LE TEST SET
+============================================================
+
+✓ Test Accuracy : 0.9234 (92.34%)
+✓ Test Loss : 0.2345
+
+Matrice de confusion :
+[[42  8]
+ [ 6 44]]
+
+              precision    recall  f1-score   support
+   No Helmet       0.88      0.84      0.86        50
+     Helmet       0.85      0.88      0.87        50
+
+✅ Évaluation terminée !
+```
+
+### 3️⃣ Faire des prédictions (Interface Web)
+
+**Terminal 1 : Lancer le serveur Flask**
+
+```bash
+python Scripts/predict_server.py
+```
+
+**Résultat** :
+```
+============================================================
+🚀 Serveur Helmet Detection en cours de démarrage...
+============================================================
+📁 Modèle : models/model_final.h5
+✅ Modèle chargé : True
+============================================================
+🌐 Serveur accessible sur : http://localhost:5000
+============================================================
+
+📚 Endpoints disponibles :
+  GET  /                 - Infos du serveur
+  GET  /health          - Santé du serveur
+  POST /predict         - Prédiction sur une image
+  POST /predict/batch   - Prédictions sur plusieurs images
+```
+
+**Terminal 2 : Tester une image**
+
+```bash
+python Scripts/test_predict.py data/dataset/test/helmet/img1.jpg
+```
+
+**Résultat** :
+```
+✅ Prédiction réussie !
+📸 Image : data/dataset/test/helmet/img1.jpg
+🎯 Classe : Helmet
+📊 Confiance : 94.23%
+📈 Probabilités :
+   - No Helmet : 5.77%
+   - Helmet : 94.23%
+```
+
+---
 
 ## 📚 Concepts Clés
 
@@ -237,6 +372,8 @@ python evaluate.py
 - **Epochs** : 10
 - **Résultat** : Accuracy ~88%
 
+**Pourquoi c'est rapide** : On n'entraîne que 5,000 paramètres au lieu de 2.3M
+
 ### Phase 2 : Fine-Tuning
 
 - **Backbone couches 1-220** : ❄️ Gelées
@@ -246,6 +383,8 @@ python evaluate.py
 - **Epochs** : 10
 - **Résultat** : Accuracy ~94%
 
+**Pourquoi un learning rate plus faible** : Ajustement fin sans oublier ImageNet
+
 ### Data Augmentation
 
 Transformations aléatoires appliquées à chaque epoch :
@@ -254,7 +393,7 @@ Transformations aléatoires appliquées à chaque epoch :
 - Zoom : 80-120%
 - Retournement horizontal
 
-**Effet** : Dataset augmenté virtuellement → moins d'overfitting
+**Effet** : Dataset augmenté virtuellement de 4-5x → moins d'overfitting
 
 ### Dropout
 
@@ -273,6 +412,7 @@ Transformations aléatoires appliquées à chaque epoch :
 | **Accuracy** | 94% | 75-80% |
 | **GPU requis** | Non (CPU ok) | Oui (recommandé) |
 | **Production** | ✅ Immédiat | ❌ Trop lent |
+| **Complexité** | Faible | Très élevée |
 
 ---
 
@@ -286,6 +426,8 @@ matplotlib==3.7.2        # Visualisation
 scikit-learn==1.3.0      # Métriques
 seaborn==0.12.2          # Visualisation avancée
 pillow==10.0.0           # Traitement d'images
+flask==2.3.0             # Serveur web
+flask-cors==4.0.0        # CORS pour Flask
 ```
 
 Pour installer automatiquement :
@@ -305,7 +447,7 @@ pip install -r requirements.txt
 
 - **Nombre d'images** : 5,000+
 - **Classes** : Helmet / No Helmet
-- **Format** : JPEG
+- **Format** : JPEG / PNG
 - **Résolution** : Variée (redimensionnée à 224×224)
 - **Répartition** : Train (60%) / Val (20%) / Test (20%)
 
@@ -336,21 +478,22 @@ Dataset Statistics:
 | Vitesse | ⚡⚡⚡ | ⚡⚡ | ⚡ |
 | Accuracy ImageNet | 92% | 94% | 90% |
 | Production | ✅ | ⚠️ | ❌ |
+| Mobile-friendly | ✅ | ❌ | ❌ |
 
 **Choix** : MobileNetV2 est le meilleur compromis entre légèreté, rapidité et performance.
 
 ### Pourquoi 224×224 pixels ?
 
 C'est la taille standard sur laquelle MobileNetV2 a été pré-entraîné. C'est un compromis optimal :
-- Assez grand pour voir les détails
-- Assez petit pour être rapide
+- Assez grand pour voir les détails (casque, visage)
+- Assez petit pour être rapide à traiter
 
 ### Pourquoi Softmax et pas Sigmoid ?
 
 - **Softmax** : Pour multi-classe mutuellement exclusif (soit Helmet, soit No Helmet)
 - **Sigmoid** : Pour multi-label (une image peut avoir plusieurs labels)
 
-Notre cas = **Softmax**
+Notre cas = **Softmax** (classification binaire)
 
 ### Comment fonctionne le Dropout ?
 
@@ -370,18 +513,19 @@ Notre cas = **Softmax**
 ```
 Accuracy = Prédictions correctes / Total de prédictions
 = (TP + TN) / (TP + TN + FP + FN)
+Quelle proportion de prédictions est correcte ?
 ```
 
 ### Precision
 ```
 Precision = TP / (TP + FP)
-Réponse à : Sur tous les "Helmet" prédits, combien étaient corrects ?
+Sur tous les "Helmet" prédits, combien étaient vraiment des casques ?
 ```
 
 ### Recall
 ```
 Recall = TP / (TP + FN)
-Réponse à : Sur tous les vrais "Helmet", combien avons-nous détecté ?
+Sur tous les vrais "Helmet", combien avons-nous détecté ?
 ```
 
 ### F1-Score
@@ -430,16 +574,29 @@ data/dataset/test/helmet/
 data/dataset/test/no_helmet/
 ```
 
+### Problème : "ModuleNotFoundError: No module named 'Scripts'"
+
+**Solution** : Lancer les scripts depuis la racine du projet
+```bash
+# Correct ✅
+python Scripts/train.py
+
+# Incorrect ❌
+cd Scripts
+python train.py
+```
+
 ---
 
 ## 📚 Améliorations Futures
 
 - [ ] Implémenter YOLO pour détection spatiale (bounding box)
 - [ ] Optimiser pour inférence mobile (TensorFlow Lite)
-- [ ] Ajouter une API REST pour déploiement en production
+- [ ] Ajouter une API REST complète pour déploiement en production
 - [ ] Créer une application web (Streamlit/Flask)
-- [ ] Augmenter la diversité du dataset
+- [ ] Augmenter la diversité du dataset (différentes ethnies, environnements)
 - [ ] Implémenter la détection vidéo en temps réel
+- [ ] Support pour d'autres casques (moto, construction, etc.)
 
 ---
 
@@ -450,6 +607,7 @@ data/dataset/test/no_helmet/
 - [TensorFlow Documentation](https://tensorflow.org/)
 - [Kaggle Dataset](https://www.kaggle.com/datasets/meliodassourav/traffic-violation-dataset-v3)
 - [Transfer Learning Guide](https://cs231n.github.io/transfer-learning/)
+- [Keras API Reference](https://keras.io/api/)
 
 ---
 
@@ -461,18 +619,19 @@ Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de déta
 
 ## 👤 Auteur
 
-**[Mohammed Akram Nejjari]**
-- 📧 Email : [akramnejjari726@gmail.com]
-- 🔗 GitHub : [AkramNejj33]
-- 💼 LinkedIn : [Mohammed Akram Nejjari]
+**Mohammed Akram Nejjari**
+- 📧 Email : akramnejjari726@gmail.com
+- 🔗 GitHub : [AkramNejj33](https://github.com/AkramNejj33)
+- 💼 LinkedIn : [Mohammed Akram Nejjari](https://www.linkedin.com/in/mohammed-akram-nejjari/)
 
 ---
 
 ## 🙏 Remerciements
 
-- **Kaggle** pour le dataset
+- **Kaggle** pour le dataset de haute qualité
 - **Google** pour MobileNetV2 et TensorFlow
 - **Communauté IA** pour les ressources et tutoriels
+- **Université** pour les conseils académiques
 
 ---
 
@@ -480,5 +639,6 @@ Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de déta
 
 **Made with ❤️ for Computer Vision & Transfer Learning**
 
+⭐ Si ce projet t'a été utile, n'hésite pas à laisser une star !
 
 </div>
