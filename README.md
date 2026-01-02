@@ -149,15 +149,14 @@ helmet-detection-transfer-learning/
 #### 1️⃣ Cloner le dépôt
 
 ```bash
-git clone https://github.com/ton-username/helmet-detection-transfer-learning.git
-cd helmet-detection-transfer-learning
+git clone https://github.com/AkramNejj33/Helmet-Detection-with-Transfer-Learning.git
 ```
 
 #### 2️⃣ Créer un environnement virtuel
 
 **Sur macOS / Linux** :
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
@@ -174,7 +173,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-⏱️ L'installation prend **5-15 minutes** (TensorFlow est lourd)
 
 #### 4️⃣ Télécharger et organiser les données
 
@@ -209,8 +207,6 @@ python train.py
 - `model_final.h5` (modèle final)
 - `training_curves.png` (courbes d'entraînement)
 
-**Durée** : ~3 minutes
-
 ### Évaluer le modèle
 
 ```bash
@@ -220,34 +216,6 @@ python evaluate.py
 **Sortie** :
 - Métriques (Accuracy, Loss, Precision, Recall, F1-Score)
 - `confusion_matrix.png` (matrice de confusion)
-
-### Faire des prédictions
-
-```python
-import tensorflow as tf
-from tensorflow import keras
-import numpy as np
-from PIL import Image
-
-# Charger le modèle
-model = keras.models.load_model('models/model_final.h5')
-
-# Charger et préparer une image
-img = Image.open('test_image.jpg').resize((224, 224))
-img_array = np.array(img) / 255.0
-img_array = np.expand_dims(img_array, axis=0)
-
-# Prédire
-prediction = model.predict(img_array)
-class_names = ['No Helmet', 'Helmet']
-predicted_class = class_names[np.argmax(prediction[0])]
-confidence = np.max(prediction[0])
-
-print(f"Prédiction: {predicted_class}")
-print(f"Confiance: {confidence:.2%}")
-```
-
----
 
 ## 📚 Concepts Clés
 
